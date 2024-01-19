@@ -11,7 +11,7 @@ Discord]
 ## Installation
 
 ```shell
-cargo add ratattui-widgets
+cargo add ratatui-widgets
 ```
 
 ## Usage
