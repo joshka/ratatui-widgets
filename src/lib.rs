@@ -39,3 +39,5 @@
 //! [Ratatui Discord]: https://discord.gg/pMCEU9hNEj
 //!
 //! [Ratatui]: https://crates.io/crates/ratatui
+
+pub mod button;
