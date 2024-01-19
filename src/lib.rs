@@ -20,7 +20,7 @@
 //!
 //! ## Example
 //!
-//! TODO: Add demo gifs
+//! ![Button](https://vhs.charm.sh/vhs-3eSOeOgVafGdaKBetrfQFv.gif)
 //!
 //! [Crates.io Badge]: https://img.shields.io/crates/v/ratatui-widgets?logo=rust&style=for-the-badge
 //! [License Badge]: https://img.shields.io/crates/l/ratatui-widgets?style=for-the-badge
