@@ -1,7 +1,11 @@
 use std::io::stdout;
 
 use color_eyre::{config::HookBuilder, Result};
-use crossterm::{terminal::*, ExecutableCommand};
+use crossterm::{
+    event::{DisableMouseCapture, EnableMouseCapture},
+    terminal::*,
+    ExecutableCommand,
+};
 use ratatui::prelude::*;
 
 mod app;
@@ -35,6 +39,7 @@ fn init_error_hooks() -> Result<()> {
 fn init_terminal() -> Result<Terminal<impl Backend>> {
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
+    stdout().execute(EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout());
     let terminal = Terminal::new(backend)?;
     Ok(terminal)
@@ -43,5 +48,6 @@ fn init_terminal() -> Result<Terminal<impl Backend>> {
 fn restore_terminal() -> Result<()> {
     disable_raw_mode()?;
     stdout().execute(LeaveAlternateScreen)?;
+    stdout().execute(DisableMouseCapture)?;
     Ok(())
 }

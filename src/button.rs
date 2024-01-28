@@ -19,12 +19,14 @@ pub enum State {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Theme {
-    text: Color,
-    background: Color,
+    normal_text: Color,
+    normal_background: Color,
+    selected_text: Color,
+    selected_background: Color,
+    pressed_text: Color,
+    pressed_background: Color,
     highlight: Color,
     shadow: Color,
-    selected: Color,
-    pressed: Color,
 }
 
 impl Default for Theme {
@@ -67,29 +69,26 @@ impl<'text> Button<'text> {
 
 impl Widget for &Button<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let Theme {
-            text,
-            background,
-            highlight,
-            shadow,
-            selected,
-            pressed,
-        } = self.theme;
+        let theme = self.theme;
 
         // these are wrong
-        let text = match self.state {
-            State::Normal => text,
-            State::Selected => highlight,
-            State::Pressed => background,
+        let fg = match self.state {
+            State::Normal => theme.normal_text,
+            State::Selected => theme.selected_text,
+            State::Pressed => theme.pressed_text,
         };
-        let background = match self.state {
-            State::Normal => background,
-            State::Selected => selected,
-            State::Pressed => pressed,
+        let bg = match self.state {
+            State::Normal => theme.normal_background,
+            State::Selected => theme.selected_background,
+            State::Pressed => theme.pressed_background,
+        };
+        let (top, bottom) = if self.state == State::Pressed {
+            (theme.shadow, theme.highlight)
+        } else {
+            (theme.highlight, theme.shadow)
         };
 
-        buf.set_style(area, Style::new().bg(background).fg(text));
-        // render top line if there's enough space
+        buf.set_style(area, (fg, bg));
 
         let rows = area.rows().collect::<Vec<_>>();
         let last_index = rows.len().saturating_sub(1);
@@ -98,18 +97,21 @@ impl Widget for &Button<'_> {
             2 => (None, &rows[..last_index], Some(rows[last_index])),
             _ => (Some(rows[0]), &rows[1..last_index], Some(rows[last_index])),
         };
+
+        // render top line if there's enough space
         if let Some(first) = first {
             "▔"
                 .repeat(area.width as usize)
-                .fg(highlight)
-                .bg(background)
+                .fg(top)
+                .bg(bg)
                 .render(first, buf);
         }
+        // render bottom line if there's enough space
         if let Some(last) = last {
             "▁"
                 .repeat(area.width as usize)
-                .fg(shadow)
-                .bg(background)
+                .fg(bottom)
+                .bg(bg)
                 .render(last, buf);
         }
         self.text.clone().centered().render(middle[0], buf);
@@ -121,38 +123,46 @@ pub mod themes {
     use ratatui::style::palette::tailwind;
 
     pub const NORMAL: Theme = Theme {
-        text: tailwind::GRAY.c900,
-        background: tailwind::GRAY.c500,
-        highlight: tailwind::GRAY.c700,
-        shadow: tailwind::GRAY.c300,
-        selected: tailwind::GRAY.c700,
-        pressed: tailwind::GRAY.c900,
-    };
-
-    pub const BLUE: Theme = Theme {
-        text: tailwind::BLUE.c900,
-        background: tailwind::BLUE.c500,
-        highlight: tailwind::BLUE.c700,
-        shadow: tailwind::BLUE.c300,
-        selected: tailwind::BLUE.c700,
-        pressed: tailwind::BLUE.c900,
+        normal_text: tailwind::GRAY.c200,
+        normal_background: tailwind::GRAY.c800,
+        selected_text: tailwind::GRAY.c100,
+        selected_background: tailwind::GRAY.c700,
+        pressed_text: tailwind::GRAY.c300,
+        pressed_background: tailwind::GRAY.c900,
+        highlight: tailwind::GRAY.c600,
+        shadow: tailwind::GRAY.c950,
     };
 
     pub const RED: Theme = Theme {
-        text: tailwind::RED.c900,
-        background: tailwind::RED.c500,
-        highlight: tailwind::RED.c700,
-        shadow: tailwind::RED.c300,
-        selected: tailwind::RED.c700,
-        pressed: tailwind::RED.c900,
+        normal_text: tailwind::RED.c200,
+        normal_background: tailwind::RED.c800,
+        selected_text: tailwind::RED.c100,
+        selected_background: tailwind::RED.c700,
+        pressed_text: tailwind::RED.c300,
+        pressed_background: tailwind::RED.c900,
+        highlight: tailwind::RED.c600,
+        shadow: tailwind::RED.c950,
     };
 
     pub const GREEN: Theme = Theme {
-        text: tailwind::GREEN.c900,
-        background: tailwind::GREEN.c500,
-        highlight: tailwind::GREEN.c700,
-        shadow: tailwind::GREEN.c300,
-        selected: tailwind::GREEN.c700,
-        pressed: tailwind::GREEN.c900,
+        normal_text: tailwind::GREEN.c200,
+        normal_background: tailwind::GREEN.c800,
+        selected_text: tailwind::GREEN.c100,
+        selected_background: tailwind::GREEN.c700,
+        pressed_text: tailwind::GREEN.c300,
+        pressed_background: tailwind::GREEN.c900,
+        highlight: tailwind::GREEN.c600,
+        shadow: tailwind::GREEN.c950,
+    };
+
+    pub const BLUE: Theme = Theme {
+        normal_text: tailwind::BLUE.c200,
+        normal_background: tailwind::BLUE.c800,
+        selected_text: tailwind::BLUE.c100,
+        selected_background: tailwind::BLUE.c700,
+        pressed_text: tailwind::BLUE.c300,
+        pressed_background: tailwind::BLUE.c900,
+        highlight: tailwind::BLUE.c600,
+        shadow: tailwind::BLUE.c950,
     };
 }
