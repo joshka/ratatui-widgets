@@ -11,8 +11,10 @@ edition = "2021"
 
 [dependencies]
 derive_builder = "0.13.0"
-ratatui = "0.26.0-alpha.2"
+itertools = "0.12.0"
+ratatui = "0.26.0-alpha.3"
 
 [dev-dependencies]
 color-eyre = "0.6.2"
 crossterm = "0.27.0"
+strum = { version = "0.26.0", features = ["derive"] }

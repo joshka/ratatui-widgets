@@ -3,9 +3,9 @@
 Output "target/button.gif"
 Set Theme "Aardvark Blue"
 Set Width 1200
-Set Height 260
+Set Height 600
 Hide
-Type "cargo run --example=button"
+Type "cargo run --example=widgets"
 Enter
 Sleep 2s
 Show
