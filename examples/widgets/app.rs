@@ -1,7 +1,6 @@
 use std::io::{self};
 
 use color_eyre::Result;
-use crossterm::event;
 use ratatui::{prelude::*, style::palette::tailwind, symbols::border::*, widgets::*};
 use ratatui_widgets::events::*;
 use strum::{Display, EnumCount, EnumIter, FromRepr, IntoEnumIterator};
@@ -75,30 +74,36 @@ impl App {
         //     }
         //     _ => {}
         // }
-        let crossterm_event = event::read()?;
-        match Event::try_from(crossterm_event) {
-            Err(_) => { /* ignore for now - perhaps change this so that it returns Option? */ }
-            Ok(event) => match event {
-                Event::KeyPressed(ref key_event) => {
-                    use Key::*;
-                    match key_event.key {
-                        Char('j') | Tab => self.selected_tab = self.selected_tab.next(),
-                        Char('k') | BackTab => self.selected_tab = self.selected_tab.prev(),
-                        Char('q') | Esc => self.quit(),
-                        _ => {
-                            if self.selected_tab == ExampleTab::Buttons {
-                                self.buttons_tab.handle_event(event);
-                            }
-                        }
-                    }
-                }
-            },
+        match Event::try_from(crossterm::event::read()?) {
+            Ok(event) => self.handle_event(event),
+            Err(_) => {
+                // ignore for now. Perhaps change the try_from approach to a method that returns
+                // Option instead of Result
+            }
         }
         Ok(())
     }
 
     fn quit(&mut self) {
         self.state = RunningState::Quit;
+    }
+}
+
+impl EventHandler for App {
+    fn handle_event(&mut self, event: Event) {
+        use Key::*;
+        match event {
+            Event::KeyPressed(ref key_event) => match key_event.key {
+                Char('j') | Tab => self.selected_tab = self.selected_tab.next(),
+                Char('k') | BackTab => self.selected_tab = self.selected_tab.prev(),
+                Char('q') | Esc => self.quit(),
+                _ => {
+                    if self.selected_tab == ExampleTab::Buttons {
+                        self.buttons_tab.handle_event(event);
+                    }
+                }
+            },
+        }
     }
 }
 
