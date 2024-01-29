@@ -59,9 +59,12 @@ This is not (yet?) an official Ratatui-org project, but may be at some point in 
 Most of this list of widgets from
 <https://en.wikipedia.org/wiki/Graphical_widget#List_of_common_generic_widgets>
 
-- [ ] Work out the general way to support interaction with the keyboard / mouse
-  - Likely support mapping from Termion/Crossterm/Termwiz keyboard event to our own event
-  - Each widget supports some trait for events with a method like `fn accept(event: Event)`
+- [ ] Create an abstraction over the backend events to an event type for mouse and keyboard events
+  - [x] Crossterm
+  - [ ] Termion
+  - [ ] Termwiz
+  - [ ] Consider how to handle non mouse / keyboard events (resize, paste, focus, etc.)
+- [ ] Support keyboard shortcuts / accellerators for buttons / menus etc.
 - [ ] Consider supporting keyboard customization
 - [ ] Support themes that apply to all the widgets (colors and modifiers)
 - [ ] Decide on how to handle state (StatefulWidget vs other options)

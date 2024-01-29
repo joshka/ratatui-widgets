@@ -1,10 +1,11 @@
 use crossterm::event::{
     Event as CrosstermEvent, KeyCode as CrosstermKeyCode, KeyEvent as CrosstermKeyEvent,
-    KeyEventKind, KeyModifiers as CrosstermKeyModifiers,
+    KeyEventKind, KeyModifiers as CrosstermKeyModifiers, MouseEvent as CrosstermMouseEvent,
 };
 use thiserror::Error;
 
-use super::{Event, Key, KeyModifiers, KeyPressedEvent};
+use super::MouseEventKind;
+use super::{Event, Key, KeyModifiers, KeyPressedEvent, MouseButton, MouseEvent};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Error)]
 pub enum ConversionError {
@@ -26,11 +27,11 @@ impl TryFrom<CrosstermEvent> for Event {
         use CrosstermEvent::*;
         let event = match event {
             Key(key_event) => Event::KeyPressed(key_event.try_into()?),
+            Mouse(mouse_event) => Event::Mouse(mouse_event.into()),
             _ => return Err(ConversionError::UnknownEvent { event }),
             // TODO maybe handle these later if needed
             // FocusGained => todo!(),
             // FocusLost => todo!(),
-            // Mouse(_) => todo!(),
             // Paste(_) => todo!(),
             // Resize(_, _) => todo!(),
         };
@@ -42,11 +43,10 @@ impl TryFrom<CrosstermKeyEvent> for KeyPressedEvent {
     type Error = ConversionError;
     fn try_from(key_event: CrosstermKeyEvent) -> Result<Self, Self::Error> {
         match key_event.kind {
-            KeyEventKind::Press => {
-                let key = Key::try_from(key_event.code)?;
-                let modifiers = KeyModifiers::try_from(key_event.modifiers)?;
-                Ok(KeyPressedEvent { key, modifiers })
-            }
+            KeyEventKind::Press => Ok(KeyPressedEvent {
+                key: key_event.code.try_into()?,
+                modifiers: key_event.modifiers.into(),
+            }),
             KeyEventKind::Release => Err(ConversionError::KeyReleasedEventNotSupported),
             KeyEventKind::Repeat => Err(ConversionError::KeyRepeatedEventNotSupported),
         }
@@ -56,50 +56,85 @@ impl TryFrom<CrosstermKeyEvent> for KeyPressedEvent {
 impl TryFrom<CrosstermKeyCode> for Key {
     type Error = ConversionError;
     fn try_from(key_code: CrosstermKeyCode) -> Result<Self, Self::Error> {
-        use CrosstermKeyCode::*;
         let key = match key_code {
-            Char(c) => Key::Char(c),
-            Esc => Key::Esc,
-            Enter => Key::Enter,
-            Tab => Key::Tab,
-            BackTab => Key::BackTab,
-            Backspace => Key::Backspace,
-            Delete => Key::Delete,
-            Insert => Key::Insert,
-            Left => Key::Left,
-            Right => Key::Right,
-            Up => Key::Up,
-            Down => Key::Down,
-            Home => Key::Home,
-            End => Key::End,
-            PageUp => Key::PageUp,
-            PageDown => Key::PageDown,
-            F(num) => Key::F(num),
+            CrosstermKeyCode::Char(c) => Key::Char(c),
+            CrosstermKeyCode::Esc => Key::Esc,
+            CrosstermKeyCode::Enter => Key::Enter,
+            CrosstermKeyCode::Tab => Key::Tab,
+            CrosstermKeyCode::BackTab => Key::BackTab,
+            CrosstermKeyCode::Backspace => Key::Backspace,
+            CrosstermKeyCode::Delete => Key::Delete,
+            CrosstermKeyCode::Insert => Key::Insert,
+            CrosstermKeyCode::Left => Key::Left,
+            CrosstermKeyCode::Right => Key::Right,
+            CrosstermKeyCode::Up => Key::Up,
+            CrosstermKeyCode::Down => Key::Down,
+            CrosstermKeyCode::Home => Key::Home,
+            CrosstermKeyCode::End => Key::End,
+            CrosstermKeyCode::PageUp => Key::PageUp,
+            CrosstermKeyCode::PageDown => Key::PageDown,
+            CrosstermKeyCode::F(num) => Key::F(num),
 
             key_code => return Err(ConversionError::UnknownKey { key_code }),
             // TODO maybe handle these later if needed
-            // Null => todo!(),
-            // CapsLock => todo!(),
-            // ScrollLock => todo!(),
-            // NumLock => todo!(),
-            // PrintScreen => todo!(),
-            // Pause => todo!(),
-            // Menu => todo!(),
-            // KeypadBegin => todo!(),
-            // Media(_) => todo!(),
-            // Modifier(_) => todo!(),
+            // CrosstermKeyCode::Null => todo!(),
+            // CrosstermKeyCode::CapsLock => todo!(),
+            // CrosstermKeyCode::ScrollLock => todo!(),
+            // CrosstermKeyCode::NumLock => todo!(),
+            // CrosstermKeyCode::PrintScreen => todo!(),
+            // CrosstermKeyCode::Pause => todo!(),
+            // CrosstermKeyCode::Menu => todo!(),
+            // CrosstermKeyCode::KeypadBegin => todo!(),
+            // CrosstermKeyCode::Media(_) => todo!(),
+            // CrosstermKeyCode::Modifier(_) => todo!(),
         };
         Ok(key)
     }
 }
 
-impl TryFrom<CrosstermKeyModifiers> for KeyModifiers {
-    type Error = ConversionError;
-    fn try_from(modifiers: CrosstermKeyModifiers) -> Result<Self, Self::Error> {
-        // our modifiers area superset of crossterm's modifiers and are bit compatible
-        KeyModifiers::from_bits(modifiers.bits()).ok_or(ConversionError::UnknownModifiers {
-            modifiers: modifiers.bits(),
-        })
+impl From<CrosstermKeyModifiers> for KeyModifiers {
+    fn from(modifiers: CrosstermKeyModifiers) -> Self {
+        // our modifiers area superset of crossterm's modifiers and are bit compatible so this is
+        // safe
+        KeyModifiers::from_bits(modifiers.bits()).unwrap()
+    }
+}
+
+impl From<CrosstermMouseEvent> for MouseEvent {
+    fn from(mouse_event: CrosstermMouseEvent) -> Self {
+        MouseEvent {
+            column: mouse_event.column,
+            row: mouse_event.row,
+            kind: mouse_event.kind.into(),
+            modifiers: mouse_event.modifiers.into(),
+        }
+    }
+}
+use crossterm::event::MouseButton as CrosstermMouseButton;
+use crossterm::event::MouseEventKind as CrosstermMouseEventKind;
+
+impl From<CrosstermMouseButton> for MouseButton {
+    fn from(mouse_button: CrosstermMouseButton) -> Self {
+        match mouse_button {
+            CrosstermMouseButton::Left => MouseButton::Left,
+            CrosstermMouseButton::Right => MouseButton::Right,
+            CrosstermMouseButton::Middle => MouseButton::Middle,
+        }
+    }
+}
+
+impl From<CrosstermMouseEventKind> for MouseEventKind {
+    fn from(mouse_event_kind: CrosstermMouseEventKind) -> Self {
+        match mouse_event_kind {
+            CrosstermMouseEventKind::Down(button) => MouseEventKind::Down(button.into()),
+            CrosstermMouseEventKind::Up(button) => MouseEventKind::Up(button.into()),
+            CrosstermMouseEventKind::Drag(button) => MouseEventKind::Drag(button.into()),
+            CrosstermMouseEventKind::Moved => MouseEventKind::Moved,
+            CrosstermMouseEventKind::ScrollUp => MouseEventKind::ScrollUp,
+            CrosstermMouseEventKind::ScrollDown => MouseEventKind::ScrollDown,
+            CrosstermMouseEventKind::ScrollLeft => MouseEventKind::ScrollLeft,
+            CrosstermMouseEventKind::ScrollRight => MouseEventKind::ScrollRight,
+        }
     }
 }
 
@@ -130,7 +165,7 @@ mod tests {
         #[case] modifiers: CrosstermKeyModifiers,
         #[case] expected: KeyModifiers,
     ) {
-        let result = KeyModifiers::try_from(modifiers);
-        assert_eq!(result, Ok(expected));
+        let result = KeyModifiers::from(modifiers);
+        assert_eq!(result, expected);
     }
 }

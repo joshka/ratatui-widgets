@@ -60,6 +60,7 @@ impl EventHandler for Button<'_> {
                 Key::Char(' ') | Key::Enter => self.toggle_press(),
                 _ => {}
             },
+            _ => {}
         }
     }
 }

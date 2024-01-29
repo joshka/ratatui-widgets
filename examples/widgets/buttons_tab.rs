@@ -1,8 +1,7 @@
-use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
 use ratatui::{prelude::*, style::palette::tailwind};
 use ratatui_widgets::{
     button,
-    events::{self, EventHandler, KeyPressedEvent},
+    events::{self, *},
     Button,
 };
 
@@ -37,6 +36,7 @@ impl EventHandler for ButtonsTab {
                 Char('k') | Right => self.select_next(),
                 _ => self.selected_button().handle_event(event),
             },
+            Mouse(mouse_event) => self.handle_mouse_event(mouse_event),
         }
     }
 }

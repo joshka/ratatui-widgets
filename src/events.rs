@@ -24,6 +24,7 @@ pub trait EventHandler {
 
 pub enum Event {
     KeyPressed(KeyPressedEvent),
+    Mouse(MouseEvent),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -77,4 +78,31 @@ bitflags! {
         /// Meta key
         const META = 1 << 5;
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct MouseEvent {
+    pub column: u16,
+    pub row: u16,
+    pub kind: MouseEventKind,
+    pub modifiers: KeyModifiers,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MouseEventKind {
+    Down(MouseButton),
+    Up(MouseButton),
+    Drag(MouseButton),
+    Moved,
+    ScrollUp,
+    ScrollDown,
+    ScrollLeft,
+    ScrollRight,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MouseButton {
+    Left,
+    Right,
+    Middle,
 }

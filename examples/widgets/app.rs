@@ -5,7 +5,7 @@ use ratatui::{prelude::*, style::palette::tailwind, symbols::border::*, widgets:
 use ratatui_widgets::events::*;
 use strum::{Display, EnumCount, EnumIter, FromRepr, IntoEnumIterator};
 
-use crate::buttons::ButtonsTab;
+use crate::buttons_tab::ButtonsTab;
 
 #[derive(Debug, Default, Clone)]
 pub struct App {
@@ -54,26 +54,6 @@ impl App {
     }
 
     fn handle_events(&mut self) -> Result<()> {
-        // use KeyCode::*;
-        // match event::read()? {
-
-        //     Event::Key(key) if key.kind == KeyEventKind::Press => match key.code {
-        //         Tab => self.selected_tab = self.selected_tab.next(),
-        //         BackTab => self.selected_tab = self.selected_tab.prev(),
-        //         Char('q') | Esc => self.quit(),
-        //         _ => {
-        //             if self.selected_tab == ExampleTab::Buttons {
-        //                 self.buttons_tab.handle_key_event(key);
-        //             }
-        //         }
-        //     },
-        //     Event::Mouse(event) => {
-        //         if self.selected_tab == ExampleTab::Buttons {
-        //             self.buttons_tab.handle_mouse_event(event);
-        //         }
-        //     }
-        //     _ => {}
-        // }
         match Event::try_from(crossterm::event::read()?) {
             Ok(event) => self.handle_event(event),
             Err(_) => {
@@ -103,6 +83,11 @@ impl EventHandler for App {
                     }
                 }
             },
+            Event::Mouse(_) => {
+                if self.selected_tab == ExampleTab::Buttons {
+                    self.buttons_tab.handle_event(event);
+                }
+            }
         }
     }
 }
