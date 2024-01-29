@@ -6,13 +6,13 @@ use ratatui_widgets::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ButtonsTab {
+pub struct ButtonsExample {
     selected_index: usize,
     buttons: Vec<Button<'static>>,
     button_areas: Vec<Rect>,
 }
 
-impl Default for ButtonsTab {
+impl Default for ButtonsExample {
     fn default() -> Self {
         Self {
             selected_index: 0,
@@ -26,32 +26,29 @@ impl Default for ButtonsTab {
     }
 }
 
-impl EventHandler for ButtonsTab {
-    fn handle_event(&mut self, event: events::Event) {
-        use events::Event::*;
+impl EventHandler for ButtonsExample {
+    fn handle_key(&mut self, event: KeyPressedEvent) {
         use events::Key::*;
-        match event {
-            KeyPressed(KeyPressedEvent { ref key, .. }) => match key {
-                Char('j') | Left => self.select_previous(),
-                Char('k') | Right => self.select_next(),
-                _ => self.selected_button().handle_event(event),
-            },
-            Mouse(mouse_event) => self.handle_mouse_event(mouse_event),
+        match event.key {
+            Char('j') | Left => self.select_previous(),
+            Char('k') | Right => self.select_next(),
+            _ => self.selected_button_mut().handle_key(event),
         }
     }
-}
 
-impl ButtonsTab {
-    // TODO: this should be a method on the widget / state
-    pub fn handle_mouse_event(&mut self, event: MouseEvent) {
+    fn handle_mouse(&mut self, event: MouseEvent) {
         match event.kind {
             MouseEventKind::Down(MouseButton::Left) => self.click(event.column, event.row),
             MouseEventKind::Up(_) => self.release(),
             _ => {}
         }
     }
+}
 
-    pub fn selected_button(&mut self) -> &mut Button<'static> {
+impl ButtonsExample {
+    // TODO: this should be a method on the widget / state
+
+    pub fn selected_button_mut(&mut self) -> &mut Button<'static> {
         self.buttons.get_mut(self.selected_index).unwrap()
     }
 
@@ -94,20 +91,16 @@ impl ButtonsTab {
     }
 }
 
-impl Widget for &mut ButtonsTab {
+/// Required to be mutable because we need to store the button areas for hit testing
+impl Widget for &mut ButtonsExample {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_buttons(area, buf);
-    }
-}
-
-impl ButtonsTab {
-    fn render_buttons(&mut self, area: Rect, buf: &mut Buffer) {
         let layout = Layout::vertical([3, 0]);
         let [buttons, instructions] = area.split(&layout);
         let layout = Layout::horizontal([20, 1, 20, 1, 20, 0]);
         let [left, _, middle, _, right, _] = buttons.split(&layout);
 
         self.button_areas = vec![left, middle, right];
+
         self.buttons[0].render(left, buf);
         self.buttons[1].render(middle, buf);
         self.buttons[2].render(right, buf);

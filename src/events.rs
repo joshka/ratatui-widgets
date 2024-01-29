@@ -19,7 +19,18 @@ mod termion;
 mod termwiz;
 
 pub trait EventHandler {
-    fn handle_event(&mut self, event: Event);
+    fn handle_event(&mut self, event: Event) {
+        match event {
+            Event::KeyPressed(key_pressed_event) => self.handle_key(key_pressed_event),
+            Event::Mouse(mouse_event) => self.handle_mouse(mouse_event),
+        }
+    }
+
+    #[allow(unused_variables)]
+    fn handle_key(&mut self, event: KeyPressedEvent) {}
+
+    #[allow(unused_variables)]
+    fn handle_mouse(&mut self, event: MouseEvent) {}
 }
 
 pub enum Event {

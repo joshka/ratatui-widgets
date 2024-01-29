@@ -54,12 +54,9 @@ impl<'text> Button<'text> {
 }
 
 impl EventHandler for Button<'_> {
-    fn handle_event(&mut self, event: Event) {
-        match event {
-            Event::KeyPressed(key_event) => match key_event.key {
-                Key::Char(' ') | Key::Enter => self.toggle_press(),
-                _ => {}
-            },
+    fn handle_key(&mut self, key_event: KeyPressedEvent) {
+        match key_event.key {
+            Key::Char(' ') | Key::Enter => self.toggle_press(),
             _ => {}
         }
     }

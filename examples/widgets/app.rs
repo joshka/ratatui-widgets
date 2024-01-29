@@ -3,28 +3,27 @@ use std::io::{self};
 use color_eyre::Result;
 use ratatui::{prelude::*, style::palette::tailwind, symbols::border::*, widgets::*};
 use ratatui_widgets::events::*;
-use strum::{Display, EnumCount, EnumIter, FromRepr, IntoEnumIterator};
+use strum::{Display, EnumIter, IntoEnumIterator};
 
-use crate::buttons_tab::ButtonsTab;
+use crate::buttons_example::ButtonsExample;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug)]
 pub struct App {
     state: RunningState,
-    selected_tab: ExampleTab,
-    buttons_tab: ButtonsTab,
+    selected_tab_index: usize,
+    tabs: Vec<Tab>,
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq)]
 enum RunningState {
     #[default]
     Running,
     Quit,
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Display, EnumIter, FromRepr, EnumCount)]
-enum ExampleTab {
-    #[default]
-    Buttons,
+#[derive(Debug, Display, EnumIter)]
+enum Tab {
+    Buttons(ButtonsExample),
     Widget2,
     Widget3,
 }
@@ -32,7 +31,9 @@ enum ExampleTab {
 impl App {
     pub fn new() -> Self {
         Self {
-            ..Default::default()
+            state: RunningState::Running,
+            selected_tab_index: 0,
+            tabs: Tab::iter().collect(),
         }
     }
 
@@ -70,39 +71,36 @@ impl App {
 }
 
 impl EventHandler for App {
-    fn handle_event(&mut self, event: Event) {
+    fn handle_key(&mut self, key_pressed_event: KeyPressedEvent) {
         use Key::*;
-        match event {
-            Event::KeyPressed(ref key_event) => match key_event.key {
-                Char('j') | Tab => self.selected_tab = self.selected_tab.next(),
-                Char('k') | BackTab => self.selected_tab = self.selected_tab.prev(),
-                Char('q') | Esc => self.quit(),
-                _ => {
-                    if self.selected_tab == ExampleTab::Buttons {
-                        self.buttons_tab.handle_event(event);
-                    }
-                }
-            },
-            Event::Mouse(_) => {
-                if self.selected_tab == ExampleTab::Buttons {
-                    self.buttons_tab.handle_event(event);
-                }
+        match key_pressed_event.key {
+            Tab => self.next_tab(),
+            BackTab => self.prev_tab(),
+            Char('q') | Esc => self.quit(),
+            _ => {
+                self.selected_tab_mut().handle_key(key_pressed_event);
             }
         }
     }
+
+    fn handle_mouse(&mut self, event: MouseEvent) {
+        self.selected_tab_mut().handle_mouse(event);
+    }
 }
 
-impl ExampleTab {
-    fn next(self) -> Self {
-        let index = self as usize;
-        let next = (index + 1) % Self::COUNT;
-        Self::from_repr(next).unwrap()
+impl App {
+    fn selected_tab_mut(&mut self) -> &mut Tab {
+        self.tabs.get_mut(self.selected_tab_index).unwrap()
     }
 
-    fn prev(self) -> Self {
-        let index = self as usize;
-        let prev = (index + Self::COUNT - 1) % Self::COUNT;
-        Self::from_repr(prev).unwrap()
+    pub fn next_tab(&mut self) {
+        let tab_count = self.tabs.len();
+        self.selected_tab_index = (self.selected_tab_index + 1) % tab_count;
+    }
+
+    pub fn prev_tab(&mut self) {
+        let tab_count = self.tabs.len();
+        self.selected_tab_index = (self.selected_tab_index + tab_count - 1) % tab_count;
     }
 }
 
@@ -117,7 +115,7 @@ impl Widget for &mut App {
         self.footer().render(footer, buf);
         self.title().render(title, buf);
         self.tabs().render(tabs, buf);
-        self.render_tab(body, buf);
+        self.selected_tab_mut().render(body, buf);
     }
 }
 
@@ -135,50 +133,66 @@ impl App {
     }
 
     fn tabs(&self) -> impl Widget {
-        Tabs::new(ExampleTab::titles())
-            .select(self.selected_tab as usize)
+        Tabs::new(self.tabs.iter().map(Tab::title))
+            .select(self.selected_tab_index)
             .divider(" ")
             .padding("", "")
             .highlight_style(Modifier::BOLD)
     }
+}
 
-    fn render_tab(&mut self, area: Rect, buf: &mut Buffer) {
+impl Widget for &mut Tab {
+    fn render(self, area: Rect, buf: &mut Buffer) {
         let block = Block::default()
             .borders(Borders::ALL)
             .border_set(PROPORTIONAL_TALL)
-            .border_style(self.selected_tab.color())
+            .border_style(self.color())
             .padding(Padding::horizontal(1));
         let inner = block.inner(area);
         block.render(area, buf);
 
-        match self.selected_tab {
-            ExampleTab::Buttons => self.buttons_tab.render(inner, buf),
-            ExampleTab::Widget2 => Line::raw("TODO").render(inner, buf),
-            ExampleTab::Widget3 => Line::raw("TODO").render(inner, buf),
+        match self {
+            Tab::Buttons(buttons) => buttons.render(inner, buf),
+            Tab::Widget2 => Line::raw("TODO").render(inner, buf),
+            Tab::Widget3 => Line::raw("TODO").render(inner, buf),
         }
     }
 }
 
-impl ExampleTab {
-    fn titles() -> impl Iterator<Item = Line<'static>> {
-        Self::iter().map(|tab| tab.title().into())
+impl EventHandler for Tab {
+    fn handle_key(&mut self, event: KeyPressedEvent) {
+        match self {
+            Tab::Buttons(buttons) => buttons.handle_key(event),
+            Tab::Widget2 => {}
+            Tab::Widget3 => {}
+        }
     }
 
+    fn handle_mouse(&mut self, event: MouseEvent) {
+        match self {
+            Tab::Buttons(buttons) => buttons.handle_mouse(event),
+            Tab::Widget2 => {}
+            Tab::Widget3 => {}
+        }
+    }
+}
+
+impl Tab {
     fn title(&self) -> Span<'static> {
         // use blue, emerald, indigo, red, yellow, ...
         let bg = match self {
-            ExampleTab::Buttons => tailwind::BLUE.c700,
-            ExampleTab::Widget2 => tailwind::EMERALD.c700,
-            ExampleTab::Widget3 => tailwind::PURPLE.c700,
+            Tab::Buttons(_) => tailwind::BLUE.c700,
+            Tab::Widget2 => tailwind::EMERALD.c700,
+            Tab::Widget3 => tailwind::PURPLE.c700,
         };
         format!("  {self}  ").fg(tailwind::SLATE.c200).bg(bg)
     }
 
     fn color(&self) -> Color {
         match self {
-            ExampleTab::Buttons => tailwind::BLUE.c700,
-            ExampleTab::Widget2 => tailwind::EMERALD.c700,
-            ExampleTab::Widget3 => tailwind::PURPLE.c700,
+            Tab::Buttons(_) => tailwind::BLUE.c700,
+            Tab::Widget2 => tailwind::EMERALD.c700,
+            Tab::Widget3 => tailwind::PURPLE.c700,
         }
     }
 }

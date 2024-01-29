@@ -5,7 +5,7 @@ use crossterm::{event::*, terminal::*, ExecutableCommand};
 use ratatui::prelude::*;
 
 mod app;
-mod buttons_tab;
+mod buttons_example;
 use app::App;
 
 fn main() -> Result<()> {
