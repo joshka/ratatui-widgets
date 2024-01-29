@@ -1,10 +1,14 @@
-use crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind};
+use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
 use ratatui::{prelude::*, style::palette::tailwind};
-use ratatui_widgets::{button, Button};
+use ratatui_widgets::{
+    button,
+    events::{self, EventHandler, KeyPressedEvent},
+    Button,
+};
 
 #[derive(Debug, Clone)]
 pub struct ButtonsTab {
-    selected: usize,
+    selected_index: usize,
     buttons: Vec<Button<'static>>,
     button_areas: Vec<Rect>,
 }
@@ -12,7 +16,7 @@ pub struct ButtonsTab {
 impl Default for ButtonsTab {
     fn default() -> Self {
         Self {
-            selected: 0,
+            selected_index: 0,
             buttons: vec![
                 Button::new("Button 1").with_theme(button::themes::RED),
                 Button::new("Button 2").with_theme(button::themes::GREEN),
@@ -23,18 +27,21 @@ impl Default for ButtonsTab {
     }
 }
 
-impl ButtonsTab {
-    // TODO: this should hanle press and release events to allow for a "click" effect
-    pub fn handle_key_press(&mut self, key: KeyEvent) {
-        use KeyCode::*;
-        match key.code {
-            Char('j') | Left => self.select_previous(),
-            Char('k') | Right => self.select_next(),
-            Char(' ') | Enter => self.press(),
-            _ => {}
+impl EventHandler for ButtonsTab {
+    fn handle_event(&mut self, event: events::Event) {
+        use events::Event::*;
+        use events::Key::*;
+        match event {
+            KeyPressed(KeyPressedEvent { ref key, .. }) => match key {
+                Char('j') | Left => self.select_previous(),
+                Char('k') | Right => self.select_next(),
+                _ => self.selected_button().handle_event(event),
+            },
         }
     }
+}
 
+impl ButtonsTab {
     // TODO: this should be a method on the widget / state
     pub fn handle_mouse_event(&mut self, event: MouseEvent) {
         match event.kind {
@@ -42,6 +49,10 @@ impl ButtonsTab {
             MouseEventKind::Up(_) => self.release(),
             _ => {}
         }
+    }
+
+    pub fn selected_button(&mut self) -> &mut Button<'static> {
+        self.buttons.get_mut(self.selected_index).unwrap()
     }
 
     // TODO hit test should be a method on the widget / state
@@ -55,31 +66,31 @@ impl ButtonsTab {
             if area_contains_click {
                 // clear current selection
                 self.release();
-                self.buttons[i].press();
-                self.selected = i;
+                self.buttons[i].toggle_press();
+                self.selected_index = i;
                 break;
             }
         }
     }
 
     fn release(&mut self) {
-        self.buttons[self.selected].select();
+        self.buttons[self.selected_index].select();
     }
 
     pub fn select_next(&mut self) {
-        self.buttons[self.selected].normal();
-        self.selected = (self.selected + 1) % self.buttons.len();
-        self.buttons[self.selected].select();
+        self.buttons[self.selected_index].normal();
+        self.selected_index = (self.selected_index + 1) % self.buttons.len();
+        self.buttons[self.selected_index].select();
     }
 
     pub fn select_previous(&mut self) {
-        self.buttons[self.selected].normal();
-        self.selected = (self.selected + self.buttons.len() - 1) % self.buttons.len();
-        self.buttons[self.selected].select();
+        self.buttons[self.selected_index].normal();
+        self.selected_index = (self.selected_index + self.buttons.len() - 1) % self.buttons.len();
+        self.buttons[self.selected_index].select();
     }
 
     pub fn press(&mut self) {
-        self.buttons[self.selected].press();
+        self.buttons[self.selected_index].toggle_press();
     }
 }
 

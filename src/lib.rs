@@ -41,4 +41,5 @@
 //! [Ratatui]: https://crates.io/crates/ratatui
 
 pub mod button;
+pub mod events;
 pub use button::{Button, State as ButtonState, Theme as ButtonTheme};

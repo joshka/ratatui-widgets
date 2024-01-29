@@ -1,8 +1,9 @@
 use std::io::{self};
 
 use color_eyre::Result;
-use crossterm::event::{self, Event, KeyCode, KeyEventKind};
+use crossterm::event;
 use ratatui::{prelude::*, style::palette::tailwind, symbols::border::*, widgets::*};
+use ratatui_widgets::events::*;
 use strum::{Display, EnumCount, EnumIter, FromRepr, IntoEnumIterator};
 
 use crate::buttons::ButtonsTab;
@@ -54,24 +55,44 @@ impl App {
     }
 
     fn handle_events(&mut self) -> Result<()> {
-        use KeyCode::*;
-        match event::read()? {
-            Event::Key(key) if key.kind == KeyEventKind::Press => match key.code {
-                Tab => self.selected_tab = self.selected_tab.next(),
-                BackTab => self.selected_tab = self.selected_tab.prev(),
-                Char('q') | Esc => self.quit(),
-                _ => {
-                    if self.selected_tab == ExampleTab::Buttons {
-                        self.buttons_tab.handle_key_press(key);
+        // use KeyCode::*;
+        // match event::read()? {
+
+        //     Event::Key(key) if key.kind == KeyEventKind::Press => match key.code {
+        //         Tab => self.selected_tab = self.selected_tab.next(),
+        //         BackTab => self.selected_tab = self.selected_tab.prev(),
+        //         Char('q') | Esc => self.quit(),
+        //         _ => {
+        //             if self.selected_tab == ExampleTab::Buttons {
+        //                 self.buttons_tab.handle_key_event(key);
+        //             }
+        //         }
+        //     },
+        //     Event::Mouse(event) => {
+        //         if self.selected_tab == ExampleTab::Buttons {
+        //             self.buttons_tab.handle_mouse_event(event);
+        //         }
+        //     }
+        //     _ => {}
+        // }
+        let crossterm_event = event::read()?;
+        match Event::try_from(crossterm_event) {
+            Err(_) => { /* ignore for now - perhaps change this so that it returns Option? */ }
+            Ok(event) => match event {
+                Event::KeyPressed(ref key_event) => {
+                    use Key::*;
+                    match key_event.key {
+                        Char('j') | Tab => self.selected_tab = self.selected_tab.next(),
+                        Char('k') | BackTab => self.selected_tab = self.selected_tab.prev(),
+                        Char('q') | Esc => self.quit(),
+                        _ => {
+                            if self.selected_tab == ExampleTab::Buttons {
+                                self.buttons_tab.handle_event(event);
+                            }
+                        }
                     }
                 }
             },
-            Event::Mouse(event) => {
-                if self.selected_tab == ExampleTab::Buttons {
-                    self.buttons_tab.handle_mouse_event(event);
-                }
-            }
-            _ => {}
         }
         Ok(())
     }

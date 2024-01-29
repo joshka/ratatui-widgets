@@ -2,6 +2,8 @@
 
 use ratatui::{prelude::*, widgets::Widget};
 
+use crate::events::*;
+
 #[derive(Debug, Clone)]
 pub struct Button<'text> {
     text: Text<'text>,
@@ -49,13 +51,30 @@ impl<'text> Button<'text> {
         self.theme = theme;
         self
     }
+}
+
+impl EventHandler for Button<'_> {
+    fn handle_event(&mut self, event: Event) {
+        match event {
+            Event::KeyPressed(key_event) => match key_event.key {
+                Key::Char(' ') | Key::Enter => self.toggle_press(),
+                _ => {}
+            },
+        }
+    }
+}
+
+impl Button<'_> {
+    pub fn toggle_press(&mut self) {
+        match self.state {
+            State::Normal => self.press(),
+            State::Selected => self.press(),
+            State::Pressed => self.select(),
+        }
+    }
 
     pub fn press(&mut self) {
-        if self.state == State::Selected {
-            self.state = State::Pressed;
-        } else {
-            self.state = State::Selected;
-        }
+        self.state = State::Pressed;
     }
 
     pub fn normal(&mut self) {

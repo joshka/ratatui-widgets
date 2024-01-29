@@ -1,11 +1,7 @@
 use std::io::stdout;
 
 use color_eyre::{config::HookBuilder, Result};
-use crossterm::{
-    event::{DisableMouseCapture, EnableMouseCapture},
-    terminal::*,
-    ExecutableCommand,
-};
+use crossterm::{event::*, terminal::*, ExecutableCommand};
 use ratatui::prelude::*;
 
 mod app;
