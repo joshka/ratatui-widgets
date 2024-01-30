@@ -22,7 +22,7 @@ cargo add ratatui-widgets
 
 ## Example
 
-![Button](https://vhs.charm.sh/vhs-3eSOeOgVafGdaKBetrfQFv.gif)
+![Button](https://vhs.charm.sh/vhs-MSE5G9byLklG23xdJwbqR.gif)
 
 [Crates.io Badge]: https://img.shields.io/crates/v/ratatui-widgets?logo=rust&style=for-the-badge
 [License Badge]: https://img.shields.io/crates/l/ratatui-widgets?style=for-the-badge

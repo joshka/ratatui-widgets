@@ -10,3 +10,15 @@ Enter
 Sleep 2s
 Show
 Sleep 1s
+Type @250ms "  "
+Sleep 500ms
+Right @250ms
+Type @250ms "  "
+Sleep 500ms
+Right @250ms
+Type @250ms"  "
+Sleep 500ms
+Right @250ms
+Sleep 1s
+Tab @2s 3
+
