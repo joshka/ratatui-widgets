@@ -46,10 +46,8 @@ impl EventHandler for ButtonsExample {
 }
 
 impl ButtonsExample {
-    // TODO: this should be a method on the widget / state
-
     pub fn selected_button_mut(&mut self) -> &mut Button<'static> {
-        self.buttons.get_mut(self.selected_index).unwrap()
+        &mut self.buttons[self.selected_index]
     }
 
     // TODO hit test should be a method on the widget / state
@@ -71,19 +69,21 @@ impl ButtonsExample {
     }
 
     fn release(&mut self) {
-        self.buttons[self.selected_index].select();
+        self.selected_button_mut().select();
     }
 
     pub fn select_next(&mut self) {
-        self.buttons[self.selected_index].normal();
-        self.selected_index = (self.selected_index + 1) % self.buttons.len();
-        self.buttons[self.selected_index].select();
+        self.select_index((self.selected_index + 1) % self.buttons.len())
     }
 
     pub fn select_previous(&mut self) {
-        self.buttons[self.selected_index].normal();
-        self.selected_index = (self.selected_index + self.buttons.len() - 1) % self.buttons.len();
-        self.buttons[self.selected_index].select();
+        self.select_index((self.selected_index + self.buttons.len() - 1) % self.buttons.len());
+    }
+
+    pub fn select_index(&mut self, index: usize) {
+        self.selected_button_mut().normal();
+        self.selected_index = index % self.buttons.len();
+        self.selected_button_mut().select();
     }
 
     pub fn press(&mut self) {
