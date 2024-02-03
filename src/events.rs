@@ -63,6 +63,7 @@ pub enum Key {
     Tab,
     BackTab,
     F(u8),
+    Null,
 }
 
 bitflags! {

@@ -6,13 +6,13 @@ use ratatui_widgets::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ButtonsExample {
+pub struct ButtonsTab {
     selected_index: usize,
     buttons: Vec<Button<'static>>,
     button_areas: Vec<Rect>,
 }
 
-impl Default for ButtonsExample {
+impl Default for ButtonsTab {
     fn default() -> Self {
         Self {
             selected_index: 0,
@@ -26,7 +26,7 @@ impl Default for ButtonsExample {
     }
 }
 
-impl EventHandler for ButtonsExample {
+impl EventHandler for ButtonsTab {
     fn handle_key(&mut self, event: KeyPressedEvent) {
         use events::Key::*;
         match event.key {
@@ -45,7 +45,7 @@ impl EventHandler for ButtonsExample {
     }
 }
 
-impl ButtonsExample {
+impl ButtonsTab {
     pub fn selected_button_mut(&mut self) -> &mut Button<'static> {
         &mut self.buttons[self.selected_index]
     }
@@ -92,12 +92,12 @@ impl ButtonsExample {
 }
 
 /// Required to be mutable because we need to store the button areas for hit testing
-impl Widget for &mut ButtonsExample {
+impl Widget for &mut ButtonsTab {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let layout = Layout::vertical([3, 0]);
-        let [buttons, instructions] = area.split(&layout);
+        let [buttons, instructions] = layout.areas(area);
         let layout = Layout::horizontal([20, 1, 20, 1, 20, 0]);
-        let [left, _, middle, _, right, _] = buttons.split(&layout);
+        let [left, _, middle, _, right, _] = layout.areas(buttons);
 
         self.button_areas = vec![left, middle, right];
 

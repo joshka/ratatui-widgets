@@ -1,30 +1,30 @@
 use termion::event::Key as TermionKey;
 
-use super::KeyPressedEvent;
+use super::Key;
 
-impl From<TermionKey> for KeyPressedEvent {
+impl From<TermionKey> for Key {
     fn from(key: TermionKey) -> Self {
-        use TermionKey::*;
+        use Key::*;
         match key {
-            Backspace => todo!(),
-            Left => todo!(),
-            Right => todo!(),
-            Up => todo!(),
-            Down => todo!(),
-            Home => todo!(),
-            End => todo!(),
-            PageUp => todo!(),
-            PageDown => todo!(),
-            BackTab => todo!(),
-            Delete => todo!(),
-            Insert => todo!(),
-            F(_) => todo!(),
-            Char(_) => todo!(),
-            Alt(_) => todo!(),
-            Ctrl(_) => todo!(),
-            Null => todo!(),
-            Esc => todo!(),
-            _ => todo!(),
+            TermionKey::Backspace => Backspace,
+            TermionKey::Left => Left,
+            TermionKey::Right => Right,
+            TermionKey::Up => Up,
+            TermionKey::Down => Down,
+            TermionKey::Home => Home,
+            TermionKey::End => End,
+            TermionKey::PageUp => PageUp,
+            TermionKey::PageDown => PageDown,
+            TermionKey::BackTab => BackTab,
+            TermionKey::Delete => Delete,
+            TermionKey::Insert => Insert,
+            TermionKey::F(n) => F(n),
+            TermionKey::Char(c) => Char(c),
+            TermionKey::Alt(c) => Char(c),
+            TermionKey::Ctrl(c) => Char(c),
+            TermionKey::Null => Null,
+            TermionKey::Esc => Esc,
+            _ => Null,
         }
     }
 }

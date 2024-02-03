@@ -5,7 +5,7 @@ use ratatui::{prelude::*, style::palette::tailwind, symbols::border::*, widgets:
 use ratatui_widgets::events::*;
 use strum::{Display, EnumIter, IntoEnumIterator};
 
-use crate::buttons_example::ButtonsExample;
+use crate::tabs::*;
 
 #[derive(Debug)]
 pub struct App {
@@ -23,8 +23,8 @@ enum RunningState {
 
 #[derive(Debug, Display, EnumIter)]
 enum Tab {
-    Buttons(ButtonsExample),
-    Widget2,
+    Buttons(ButtonsTab),
+    Stack(StackTab),
     Widget3,
 }
 
@@ -107,10 +107,10 @@ impl App {
 impl Widget for &mut App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         use Constraint::*;
-        let layout = Layout::vertical([Length(1), Proportional(1), Length(1)]);
-        let [header, body, footer] = area.split(&layout);
-        let layout = Layout::horizontal([Proportional(1), Length(15)]);
-        let [tabs, title] = header.split(&layout);
+        let layout = Layout::vertical([Length(1), Fill(1), Length(1)]);
+        let [header, body, footer] = layout.areas(area);
+        let layout = Layout::horizontal([Fill(1), Length(15)]);
+        let [tabs, title] = layout.areas(header);
 
         self.footer().render(footer, buf);
         self.title().render(title, buf);
@@ -153,7 +153,7 @@ impl Widget for &mut Tab {
 
         match self {
             Tab::Buttons(buttons) => buttons.render(inner, buf),
-            Tab::Widget2 => Line::raw("TODO").render(inner, buf),
+            Tab::Stack(stack) => stack.render(inner, buf),
             Tab::Widget3 => Line::raw("TODO").render(inner, buf),
         }
     }
@@ -163,7 +163,7 @@ impl EventHandler for Tab {
     fn handle_key(&mut self, event: KeyPressedEvent) {
         match self {
             Tab::Buttons(buttons) => buttons.handle_key(event),
-            Tab::Widget2 => {}
+            Tab::Stack(stack) => stack.handle_key(event),
             Tab::Widget3 => {}
         }
     }
@@ -171,7 +171,7 @@ impl EventHandler for Tab {
     fn handle_mouse(&mut self, event: MouseEvent) {
         match self {
             Tab::Buttons(buttons) => buttons.handle_mouse(event),
-            Tab::Widget2 => {}
+            Tab::Stack(_) => {}
             Tab::Widget3 => {}
         }
     }
@@ -182,7 +182,7 @@ impl Tab {
         // use blue, emerald, indigo, red, yellow, ...
         let bg = match self {
             Tab::Buttons(_) => tailwind::BLUE.c700,
-            Tab::Widget2 => tailwind::EMERALD.c700,
+            Tab::Stack(_) => tailwind::EMERALD.c700,
             Tab::Widget3 => tailwind::PURPLE.c700,
         };
         format!("  {self}  ").fg(tailwind::SLATE.c200).bg(bg)
@@ -191,7 +191,7 @@ impl Tab {
     fn color(&self) -> Color {
         match self {
             Tab::Buttons(_) => tailwind::BLUE.c700,
-            Tab::Widget2 => tailwind::EMERALD.c700,
+            Tab::Stack(_) => tailwind::EMERALD.c700,
             Tab::Widget3 => tailwind::PURPLE.c700,
         }
     }
