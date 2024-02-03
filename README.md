@@ -54,6 +54,25 @@ added. Release-plz will keep the version updated with respect to semver and will
 
 This is not (yet?) an official Ratatui-org project, but may be at some point in the future.
 
+## Features
+
+- Basic event handling abstraction and keyboard / mouse handling
+- Basic buttons
+
+  ```rust
+  let button = Button::new("Click me");
+  ```
+
+- Stack container that handles widgets and layouts
+
+  ```rust
+  let stack = StackContainer::horizontal().with_widgets(vec![
+      (Box::new(Line::raw("Left")), Constraint::Fill(1)),
+      (Box::new(Text::raw("Center")), Constraint::Fill(1)),
+      (Box::new(Span::raw("Right")), Constraint::Fill(1)),
+  ]);
+  ```
+
 ## TODO
 
 Most of this list of widgets from

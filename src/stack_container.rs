@@ -14,7 +14,16 @@ use std::fmt;
 ///
 /// let mut stack = StackContainer::horizontal();
 /// stack.push(Box::new(Paragraph::new("Left")), Constraint::Fill(1));
+/// stack.push(Box::new(Paragraph::new("Center")), Constraint::Fill(2));
 /// stack.push(Box::new(Paragraph::new("Right")), Constraint::Fill(1));
+///
+/// // or
+///
+/// let stack = StackContainer::horizontal().with_widgets(vec![
+///     (Box::new(Paragraph::new("Left")), Constraint::Fill(1)),
+///     (Box::new(Paragraph::new("Center")), Constraint::Fill(2)),
+///     (Box::new(Paragraph::new("Right")), Constraint::Fill(1)),
+/// ]);
 /// ```
 #[derive(Default)]
 pub struct StackContainer {
