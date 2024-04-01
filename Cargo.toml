@@ -21,7 +21,7 @@ termwiz = { version = "0.22.0", optional = true }
 thiserror = "1.0.58"
 
 [dev-dependencies]
-color-eyre = "0.6.2"
+color-eyre = "0.6.3"
 rand = "0.8.5"
 rstest = "0.18.2"
 strum = { version = "0.26.2", features = ["derive"] }
