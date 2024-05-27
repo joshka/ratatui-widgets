@@ -1055,7 +1055,7 @@ dependencies = [
 
 [[package]]
 name = "ratatui-widgets"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "bitflags 2.5.0",
  "color-eyre",
