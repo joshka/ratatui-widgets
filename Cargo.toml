@@ -16,7 +16,7 @@ derive_builder = "0.20.0"
 itertools = "0.13.0"
 ratatui = { version= "0.26.3", features = ["unstable-widget-ref"] }
 strum = { version = "0.26.2", features = ["derive"] }
-termion = { version = "4.0.0", optional = true }
+termion = { version = "4.0.2", optional = true }
 termwiz = { version = "0.22.0", optional = true }
 thiserror = "1.0.61"
 
