@@ -18,7 +18,7 @@ ratatui = { version= "0.27.0", features = ["unstable-widget-ref"] }
 strum = { version = "0.26.3", features = ["derive"] }
 termion = { version = "4.0.2", optional = true }
 termwiz = { version = "0.22.0", optional = true }
-thiserror = "1.0.61"
+thiserror = "1.0.62"
 
 [dev-dependencies]
 color-eyre = "0.6.3"
