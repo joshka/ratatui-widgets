@@ -23,7 +23,7 @@ thiserror = "1.0.64"
 [dev-dependencies]
 color-eyre = "0.6.3"
 rand = "0.8.5"
-rstest = "0.22.0"
+rstest = "0.23.0"
 strum = { version = "0.26.3", features = ["derive"] }
 
 [features]
