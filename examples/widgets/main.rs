@@ -11,8 +11,10 @@ mod app;
 mod tabs {
     mod buttons;
     mod stack;
+    mod toggle_switch;
     pub use buttons::ButtonsTab;
     pub use stack::StackTab;
+    pub use toggle_switch::ToggleSwitchTab;
 }
 use app::App;
 

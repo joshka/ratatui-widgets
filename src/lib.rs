@@ -43,6 +43,7 @@
 pub mod button;
 pub mod events;
 pub mod stack_container;
+pub mod toggle_switch;
 
 pub use button::{Button, State as ButtonState, Theme as ButtonTheme};
 pub use stack_container::StackContainer;
