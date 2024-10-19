@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.2] - 2024-10-19
 
+### Documentation
+
+- Update readme
+
 ### Miscellaneous Tasks
 
 - Mark crate as deprecated and move to tui-framework-experiment instead
