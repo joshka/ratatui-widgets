@@ -1,7 +1,7 @@
 use crate::events::{EventHandler, Key, KeyPressedEvent};
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Direction, Layout, Rect};
-use ratatui::prelude::{Color, Constraint, Position, Style, Stylize, Text, Widget};
+use ratatui::prelude::{Color, Constraint, Style, Stylize, Text, Widget};
 
 #[derive(Debug, Clone)]
 pub struct ToggleSwitch<'text> {

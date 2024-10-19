@@ -1,10 +1,6 @@
 use ratatui::{prelude::*, style::palette::tailwind};
+use ratatui_widgets::events::{self, *};
 use ratatui_widgets::toggle_switch::ToggleSwitch;
-use ratatui_widgets::{
-    button,
-    events::{self, *},
-    Button,
-};
 
 #[derive(Debug, Clone)]
 pub struct ToggleSwitchTab {
@@ -37,9 +33,8 @@ impl EventHandler for ToggleSwitchTab {
     }
 
     fn handle_mouse(&mut self, event: MouseEvent) {
-        match event.kind {
-            MouseEventKind::Down(MouseButton::Left) => self.click(event.column, event.row),
-            _ => {}
+        if let MouseEventKind::Down(MouseButton::Left) = event.kind {
+            self.click(event.column, event.row)
         }
     }
 }
