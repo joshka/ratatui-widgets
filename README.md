@@ -2,6 +2,11 @@
 
 # Ratatui-widgets
 
+Please note: this crate is deprecated so that we can use the name for an internal Ratatui widget
+crate. Please use [tui-framework-experiment] instead.
+
+[tui-framework-experiment]: https://crates.io/crates/tui-framework-experiment
+
 [![Crates.io Badge]][Crate] [![License Badge]](#license) [![Docs.rs Badge]][API Docs]<br>
 [![Deps.rs Badge]][Dependencies] [![Codecov.io Badge]][Coverage] [![Discord Badge]][Ratatui
 Discord]
