@@ -156,7 +156,7 @@ impl Widget for &mut Tab {
             Tab::Buttons(buttons) => buttons.render(inner, buf),
             Tab::Stack(stack) => stack.render(inner, buf),
             Tab::Widget3 => Line::raw("TODO").render(inner, buf),
-            Tab::ToggleSwitch(switches) => switches.render(inner, buf)
+            Tab::ToggleSwitch(switches) => switches.render(inner, buf),
         }
     }
 }
@@ -176,7 +176,7 @@ impl EventHandler for Tab {
             Tab::Buttons(buttons) => buttons.handle_mouse(event),
             Tab::Stack(_) => {}
             Tab::Widget3 => {}
-            Tab::ToggleSwitch(switches) => switches.handle_mouse(event)
+            Tab::ToggleSwitch(switches) => switches.handle_mouse(event),
         }
     }
 }
@@ -188,7 +188,7 @@ impl Tab {
             Tab::Buttons(_) => tailwind::BLUE.c700,
             Tab::Stack(_) => tailwind::EMERALD.c700,
             Tab::Widget3 => tailwind::PURPLE.c700,
-            Tab::ToggleSwitch(_) => tailwind::RED.c700
+            Tab::ToggleSwitch(_) => tailwind::RED.c700,
         };
         format!("  {self}  ").fg(tailwind::SLATE.c200).bg(bg)
     }

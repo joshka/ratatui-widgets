@@ -1,10 +1,10 @@
 use ratatui::{prelude::*, style::palette::tailwind};
+use ratatui_widgets::toggle_switch::ToggleSwitch;
 use ratatui_widgets::{
     button,
     events::{self, *},
     Button,
 };
-use ratatui_widgets::toggle_switch::ToggleSwitch;
 
 #[derive(Debug, Clone)]
 pub struct ToggleSwitchTab {
@@ -66,7 +66,7 @@ impl ToggleSwitchTab {
             }
         }
     }
-    
+
     pub fn release(&mut self) {
         self.selected_switch_mut().normal();
     }

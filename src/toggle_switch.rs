@@ -49,8 +49,6 @@ impl Default for Theme {
     }
 }
 
-
-
 impl<'text> ToggleSwitch<'text> {
     pub fn new<T: Into<Text<'text>>>(is_on: bool, text: T) -> Self {
         Self {
@@ -79,8 +77,14 @@ impl EventHandler for ToggleSwitch<'_> {
 impl ToggleSwitch<'_> {
     pub fn toggle_press(&mut self) {
         match self.state {
-            State::On => { self.toggle_off(); self.select() },
-            State::Off => { self.toggle_on(); self.select() },
+            State::On => {
+                self.toggle_off();
+                self.select()
+            }
+            State::Off => {
+                self.toggle_on();
+                self.select()
+            }
         }
     }
 
@@ -131,51 +135,53 @@ impl Widget for &ToggleSwitch<'_> {
             (State::Off, false) => theme.idle_bg_on_main,
         };
 
-        let (tick_highlight, tick_shadow, cross_highlight, cross_shadow) = match (self.state, self.is_selected) {
-            (State::On, true) => (
-                theme.selected_bg_on_highlight,
-                theme.selected_bg_on_shadow,
-                theme.selected_bg_off_highlight,
-                theme.selected_bg_off_shadow,
+        let (tick_highlight, tick_shadow, cross_highlight, cross_shadow) =
+            match (self.state, self.is_selected) {
+                (State::On, true) => (
+                    theme.selected_bg_on_highlight,
+                    theme.selected_bg_on_shadow,
+                    theme.selected_bg_off_highlight,
+                    theme.selected_bg_off_shadow,
                 ),
-            (State::On, false) => (
-                theme.idle_bg_on_highlight,
-                theme.idle_bg_on_shadow,
-                theme.idle_bg_off_highlight,
-                theme.idle_bg_off_shadow,
+                (State::On, false) => (
+                    theme.idle_bg_on_highlight,
+                    theme.idle_bg_on_shadow,
+                    theme.idle_bg_off_highlight,
+                    theme.idle_bg_off_shadow,
                 ),
-            (State::Off, true) => (
-                theme.selected_bg_off_highlight,
-                theme.selected_bg_off_shadow,
-                theme.selected_bg_on_highlight,
-                theme.selected_bg_on_shadow,
+                (State::Off, true) => (
+                    theme.selected_bg_off_highlight,
+                    theme.selected_bg_off_shadow,
+                    theme.selected_bg_on_highlight,
+                    theme.selected_bg_on_shadow,
                 ),
-            (State::Off, false) => (
-                theme.idle_bg_off_highlight,
-                theme.idle_bg_off_shadow,
-                theme.idle_bg_on_highlight,
-                theme.idle_bg_on_shadow,
+                (State::Off, false) => (
+                    theme.idle_bg_off_highlight,
+                    theme.idle_bg_off_shadow,
+                    theme.idle_bg_on_highlight,
+                    theme.idle_bg_on_shadow,
                 ),
-            
-        };
+            };
 
         let areas = Layout::new(
             Direction::Horizontal,
             [
                 Constraint::Max(10),
                 Constraint::Length(2),
-                Constraint::Fill(1)
+                Constraint::Fill(1),
             ],
-        ).split(area);
+        )
+        .split(area);
 
         let (switch, label) = (areas[0], areas[2]);
-        
+
         let switch_areas = Layout::new(
             Direction::Horizontal,
-            [Constraint::Fill(1), Constraint::Fill(1)]
-        ).split(switch);
-        
-        let (cross, tick)  = (switch_areas[0], switch_areas[1]);
+            [Constraint::Fill(1), Constraint::Fill(1)],
+        )
+        .split(switch);
+
+        let (cross, tick) = (switch_areas[0], switch_areas[1]);
 
         buf.set_style(cross, (cross_fg, cross_bg));
         buf.set_style(tick, (tick_fg, tick_bg));
@@ -192,8 +198,9 @@ impl Widget for &ToggleSwitch<'_> {
         if let Some(first) = first {
             let parts = Layout::new(
                 Direction::Horizontal,
-                [Constraint::Fill(1), Constraint::Fill(1)]
-            ).split(first);
+                [Constraint::Fill(1), Constraint::Fill(1)],
+            )
+            .split(first);
             "▔"
                 .repeat(cross.width as usize)
                 .fg(cross_highlight)
@@ -207,11 +214,11 @@ impl Widget for &ToggleSwitch<'_> {
         }
         // render bottom line if there's enough space
         if let Some(last) = last {
-
             let parts = Layout::new(
                 Direction::Horizontal,
-                [Constraint::Fill(1), Constraint::Fill(1)]
-            ).split(last);
+                [Constraint::Fill(1), Constraint::Fill(1)],
+            )
+            .split(last);
             "▁"
                 .repeat(cross.width as usize)
                 .fg(cross_shadow)
@@ -223,15 +230,23 @@ impl Widget for &ToggleSwitch<'_> {
                 .bg(tick_bg)
                 .render(parts[1], buf);
         }
-        buf.set_style(label, Style::default().fg(
-            if self.is_selected { theme.selected_text } else { theme.idle_text }
-        ));
-        self.text.clone().left_aligned()
-            .render(label.rows().collect::<Vec<_>>()[label.height as usize / 2], buf);
+        buf.set_style(
+            label,
+            Style::default().fg(if self.is_selected {
+                theme.selected_text
+            } else {
+                theme.idle_text
+            }),
+        );
+        self.text.clone().left_aligned().render(
+            label.rows().collect::<Vec<_>>()[label.height as usize / 2],
+            buf,
+        );
         let text_areas = Layout::new(
             Direction::Horizontal,
-            [Constraint::Fill(1), Constraint::Fill(1)]
-        ).split(middle[middle.len() / 2]);
+            [Constraint::Fill(1), Constraint::Fill(1)],
+        )
+        .split(middle[middle.len() / 2]);
         Text::from("✗").centered().render(text_areas[0], buf);
         Text::from("✓").centered().render(text_areas[1], buf);
     }
