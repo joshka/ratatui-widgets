@@ -1,5 +1,10 @@
 //! # Ratatui-widgets
 //!
+//! Please note: this crate is deprecated so that we can use the name for an internal Ratatui widget
+//! crate. Please use [tui-framework-experiment] instead.
+//!
+//! [tui-framework-experiment]: https://crates.io/crates/tui-framework-experiment
+//!
 //! [![Crates.io Badge]][Crate] [![License Badge]](#license) [![Docs.rs Badge]][API Docs]<br>
 //! [![Deps.rs Badge]][Dependencies] [![Codecov.io Badge]][Coverage] [![Discord Badge]][Ratatui
 //! Discord]
@@ -40,10 +45,16 @@
 //!
 //! [Ratatui]: https://crates.io/crates/ratatui
 
+#[deprecated(note = "Use tui-framework-experiment instead")]
 pub mod button;
+#[deprecated(note = "Use tui-framework-experiment instead")]
 pub mod events;
+#[deprecated(note = "Use tui-framework-experiment instead")]
 pub mod stack_container;
+#[deprecated(note = "Use tui-framework-experiment instead")]
 pub mod toggle_switch;
 
+#[deprecated(note = "Use tui-framework-experiment instead")]
 pub use button::{Button, State as ButtonState, Theme as ButtonTheme};
+#[deprecated(note = "Use tui-framework-experiment instead")]
 pub use stack_container::StackContainer;
