@@ -25,7 +25,13 @@ enum RunningState {
 enum Tab {
     Buttons(ButtonsTab),
     Stack(StackTab),
-    Widget3,
+    ToggleSwitch(ToggleSwitchTab),
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl App {
@@ -154,7 +160,7 @@ impl Widget for &mut Tab {
         match self {
             Tab::Buttons(buttons) => buttons.render(inner, buf),
             Tab::Stack(stack) => stack.render(inner, buf),
-            Tab::Widget3 => Line::raw("TODO").render(inner, buf),
+            Tab::ToggleSwitch(switches) => switches.render(inner, buf),
         }
     }
 }
@@ -164,7 +170,7 @@ impl EventHandler for Tab {
         match self {
             Tab::Buttons(buttons) => buttons.handle_key(event),
             Tab::Stack(stack) => stack.handle_key(event),
-            Tab::Widget3 => {}
+            Tab::ToggleSwitch(switches) => switches.handle_key(event),
         }
     }
 
@@ -172,7 +178,7 @@ impl EventHandler for Tab {
         match self {
             Tab::Buttons(buttons) => buttons.handle_mouse(event),
             Tab::Stack(_) => {}
-            Tab::Widget3 => {}
+            Tab::ToggleSwitch(switches) => switches.handle_mouse(event),
         }
     }
 }
@@ -183,7 +189,7 @@ impl Tab {
         let bg = match self {
             Tab::Buttons(_) => tailwind::BLUE.c700,
             Tab::Stack(_) => tailwind::EMERALD.c700,
-            Tab::Widget3 => tailwind::PURPLE.c700,
+            Tab::ToggleSwitch(_) => tailwind::PURPLE.c700,
         };
         format!("  {self}  ").fg(tailwind::SLATE.c200).bg(bg)
     }
@@ -192,7 +198,7 @@ impl Tab {
         match self {
             Tab::Buttons(_) => tailwind::BLUE.c700,
             Tab::Stack(_) => tailwind::EMERALD.c700,
-            Tab::Widget3 => tailwind::PURPLE.c700,
+            Tab::ToggleSwitch(_) => tailwind::PURPLE.c700,
         }
     }
 }

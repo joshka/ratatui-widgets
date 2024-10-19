@@ -95,7 +95,7 @@ Most of this list of widgets from
   - [ ] Button `[Submit]`
   - [ ] Radio Button `(*) item ( ) item`
   - [ ] Check Box `[x] item`
-  - [ ] Toggle Switch `<_ON_ / OFF >`
+  - [X] Toggle Switch `<_ON_ / OFF >`
   - [ ] Toggle Button `[ON]`
   - [ ] Split Button `[Submit][↓]`
   - [ ] Cycle Button `[Red]` => `[Green]` => `[Blue]`
