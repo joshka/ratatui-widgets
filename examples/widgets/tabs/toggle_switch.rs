@@ -1,6 +1,9 @@
 use ratatui::{prelude::*, style::palette::tailwind};
-use ratatui_widgets::events::{self, *};
 use ratatui_widgets::toggle_switch::ToggleSwitch;
+use ratatui_widgets::{
+    events::{self, *},
+    toggle_switch::State,
+};
 
 #[derive(Debug, Clone)]
 pub struct ToggleSwitchTab {
@@ -14,8 +17,8 @@ impl Default for ToggleSwitchTab {
         Self {
             selected_index: 0,
             switches: vec![
-                ToggleSwitch::new(false, "Turned off"),
-                ToggleSwitch::new(true, "Turned on"),
+                ToggleSwitch::new("Turned off", State::Off),
+                ToggleSwitch::new("Turned on", State::On),
             ],
             switch_areas: vec![],
         }
@@ -26,8 +29,8 @@ impl EventHandler for ToggleSwitchTab {
     fn handle_key(&mut self, event: KeyPressedEvent) {
         use events::Key::*;
         match event.key {
-            Char('j') | Left => self.select_previous(),
-            Char('k') | Right => self.select_next(),
+            Char('k') | Up => self.select_previous(),
+            Char('j') | Down => self.select_next(),
             _ => self.selected_switch_mut().handle_key(event),
         }
     }
@@ -47,15 +50,10 @@ impl ToggleSwitchTab {
     // TODO hit test should be a method on the widget / state
     fn click(&mut self, column: u16, row: u16) {
         for (i, area) in self.switch_areas.iter().enumerate() {
-            // TODO Rect should have a contains method
-            let area_contains_click = area.left() <= column
-                && column < area.right()
-                && area.top() <= row
-                && row < area.bottom();
-            if area_contains_click {
+            if area.contains(Position::new(column, row)) {
                 // clear current selection
                 self.release();
-                self.switches[i].toggle_press();
+                self.switches[i].toggle_state();
                 self.selected_index = i;
                 break;
             }
@@ -63,7 +61,7 @@ impl ToggleSwitchTab {
     }
 
     pub fn release(&mut self) {
-        self.selected_switch_mut().normal();
+        self.selected_switch_mut().blur();
     }
 
     pub fn select_next(&mut self) {
@@ -75,13 +73,13 @@ impl ToggleSwitchTab {
     }
 
     pub fn select_index(&mut self, index: usize) {
-        self.selected_switch_mut().normal();
+        self.selected_switch_mut().blur();
         self.selected_index = index % self.switches.len();
-        self.selected_switch_mut().select();
+        self.selected_switch_mut().focus();
     }
 
     pub fn press(&mut self) {
-        self.switches[self.selected_index].toggle_press();
+        self.switches[self.selected_index].toggle_state();
     }
 }
 
